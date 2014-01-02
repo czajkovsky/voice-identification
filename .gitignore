@@ -19,6 +19,8 @@ lib
 lib64
 __pycache__
 
+train/*
+
 # Installer logs
 pip-log.txt
 

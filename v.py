@@ -3,19 +3,28 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy as sp
+import os
 import wave
-from os import listdir
-
+from pylab import *
 
 files_path = './train/'
-files = listdir(files_path)
+
+def list_files(files):
+  processed = []
+  for f in files:
+    if f[0] == '0':
+      processed.append(files_path + f)
+  return processed
+
+files = os.listdir(files_path)
+files = list_files(files)
+
 detected = 0
 
-for f_name in files:
-  original_gender = f_name[4]
+for f in files:
+  original_gender = f[len(f) - 5]
   deteceted_gender = 'K'
-
-  wave.open(files_path + f_name, 'r')
 
   if original_gender == deteceted_gender:
     detected += 1
