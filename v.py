@@ -38,12 +38,49 @@ for f_name in files:
   signal = f.readframes(-1)
   signal = np.fromstring(signal, 'Int16')
 
+  subplot(321)
+  plot(signal)
+
+  start_index = 15000
+  frame_size = 4096
+  end_index = start_index + frame_size - 1
+  signal = signal[start_index:int(end_index) + 1]
+
+  subplot(324)
+  plot(signal)
+
   fftResult = np.log(abs(fft(signal)))
   ceps = ifft(fftResult)
 
-  posmax = ceps.argmax()
+  subplot(322)
+  plot(fftResult)
 
-  print posmax
+  subplot(323)
+  plot(ceps)
+
+  nceps = len(ceps)
+  peaks = np.zeros(nceps)
+
+  print len(peaks)
+
+  k=3
+
+  while(k <= nceps - 2):
+    y1 = ceps[k - 1]
+    y2 = ceps[k]
+    y3 = ceps[k + 1]
+    if (y2 > y1 and y2 >= y3):
+      peaks[k]=ceps[k]
+    k = k + 1
+  subplot(325)
+  plot(peaks)
+
+  # print f.getsampwidth()/(max(peaks)+1)
+  print f.getframerate()
+
+  # print posmax
+
+  show()
 
   f.close()
 
