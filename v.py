@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
+from scipy.signal import blackmanharris, fftconvolve
 import os
 import wave
 from pylab import *
@@ -22,14 +23,27 @@ files = list_files(files)
 
 detected = 0
 
+frame_size = 1024
+
+
+
 for f_name in files:
+
   original_gender = f_name[len(f_name) - 5]
   deteceted_gender = 'K'
 
   f = wave.open(f_name)
-  print f.getframerate()
-  print f.getsampwidth()
-  print f.tell()
+
+  fs = f.getframerate()
+  signal = f.readframes(-1)
+  signal = np.fromstring(signal, 'Int16')
+
+  fftResult = np.log(abs(fft(signal)))
+  ceps = ifft(fftResult)
+
+  posmax = ceps.argmax()
+
+  print posmax
 
   f.close()
 
