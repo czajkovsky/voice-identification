@@ -22,9 +22,16 @@ files = list_files(files)
 
 detected = 0
 
-for f in files:
-  original_gender = f[len(f) - 5]
+for f_name in files:
+  original_gender = f_name[len(f_name) - 5]
   deteceted_gender = 'K'
+
+  f = wave.open(f_name)
+  print f.getframerate()
+  print f.getsampwidth()
+  print f.tell()
+
+  f.close()
 
   if original_gender == deteceted_gender:
     detected += 1
