@@ -1,15 +1,83 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
+from pylab import *
+import wave
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
-from scipy.signal import blackmanharris, fftconvolve
 import os
 import wave
-from pylab import *
 
-files_path = './train/'
+K = 3          # number of windows
+L = 8192       # 1st pass window overlap, 50%
+M = 16384      # 1st pass window length
+N = 32768      # 1st pass DFT lenth: acyclic correlation
+
+def welch(x, w, L, N):
+    # Welch's method
+  M = len(w)
+  K = (len(x) - L) / (M - L)
+  Xsq = zeros(N/2+1)                  # len(N-point rfft) = N/2+1
+  for k in range(K):
+    m = k * ( M - L)
+    xt = w * x[m:m+M]
+    Xsq = Xsq + abs(rfft(xt, N)) ** 2
+  Xsq = Xsq / K
+  Wsq = abs(rfft(w, N)) ** 2
+  bias = irfft(Wsq)                   # for unbiasing Rxx and Sxx
+  p = dot(x,x) / len(x)               # avg power, used as a check
+  return Xsq, bias, p
+
+def detect_frequency(g, fs):
+
+  K = 3
+  L = 8192
+  M = 16384
+  N = 32768
+
+  g = g / float64(max(abs(g)))
+  mi = len(g) / 4
+
+  x = g[mi:mi + K*M - (K-1)*L]
+  w = hamming(M)
+
+  Xsq, bias, p = welch(x, w, L, N)
+  Rxx = irfft(Xsq)
+  Rxx = Rxx / bias
+  mp = argmax(Rxx[28:561]) + 28
+
+  N = M = L - (L % mp)
+  x = g[mi:mi+K*M]
+  w = ones(M); L = 0
+  Xsq, bias, p = welch(x, w, L, N)
+  Rxx = irfft(Xsq)
+  Rxx = Rxx / bias
+  mp = argmax(Rxx[28:561]) + 28
+
+  Sxx = Xsq / bias[0]
+  Sxx[1:-1] = 2 * Sxx[1:-1]
+  Sxx = Sxx / N
+  n0 = N / mp
+  np = argmax(Sxx[n0-2:n0+3]) + n0-2
+
+  m = -1
+  m_i = -1
+  s = 0
+  fq = 0
+  for x in range(0, len(Sxx)):
+    if x > 14 and x < 45:
+      s = s + Sxx[x]
+      fq = fq + x * Sxx[x]
+
+  return fq / s * 5.5
+
+  subplot2grid((2,1), (1,0))
+  title('Power Spectral Density, S$_{xx}$'); xlabel('Frequency (Hz)')
+  fr = r_[:5 * np]; f = fs * fr / N;
+  vlines(f, 0, Sxx[fr], colors='b', linewidth=2)
+  grid(); axis('tight'); ylim(0,1.25*max(Sxx[fr]))
+  show()
 
 def list_files(files):
   processed = []
@@ -18,14 +86,13 @@ def list_files(files):
       processed.append(files_path + f)
   return processed
 
+files_path = './train/'
+
 files = os.listdir(files_path)
 files = list_files(files)
 
 detected = 0
-
-frame_size = 1024
-
-
+avg_f = 0.0
 
 for f_name in files:
 
@@ -38,49 +105,12 @@ for f_name in files:
   signal = f.readframes(-1)
   signal = np.fromstring(signal, 'Int16')
 
-  subplot(321)
-  plot(signal)
+  freq = detect_frequency(signal, fs)
 
-  start_index = 15000
-  frame_size = 4096
-  end_index = start_index + frame_size - 1
-  signal = signal[start_index:int(end_index) + 1]
+  if freq > 154.0:
+    deteceted_gender = 'M'
 
-  subplot(324)
-  plot(signal)
-
-  fftResult = np.log(abs(fft(signal)))
-  ceps = ifft(fftResult)
-
-  subplot(322)
-  plot(fftResult)
-
-  subplot(323)
-  plot(ceps)
-
-  nceps = len(ceps)
-  peaks = np.zeros(nceps)
-
-  print len(peaks)
-
-  k=3
-
-  while(k <= nceps - 2):
-    y1 = ceps[k - 1]
-    y2 = ceps[k]
-    y3 = ceps[k + 1]
-    if (y2 > y1 and y2 >= y3):
-      peaks[k]=ceps[k]
-    k = k + 1
-  subplot(325)
-  plot(peaks)
-
-  # print f.getsampwidth()/(max(peaks)+1)
-  print f.getframerate()
-
-  # print posmax
-
-  show()
+  avg_f = avg_f + freq
 
   f.close()
 
@@ -88,3 +118,10 @@ for f_name in files:
     detected += 1
 
 print float(detected)/float(len(files))
+print float(avg_f)/float(len(files))
+
+
+
+
+
+
