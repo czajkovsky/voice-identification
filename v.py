@@ -13,8 +13,27 @@ import os
 import wave
 from scikits.audiolab import wavread
 
+def line_stats(detected_k, count_k, detected_m, count_m, detected, original_gender):
+
+  if count_k == 0:
+    ratio_k = '\t\t-'
+  else:
+    ratio_k = float(detected_k) / float(count_k) * 100
+    ratio_k = "\t\tK:{0:.0f}%".format(ratio_k)
+
+  if count_m == 0:
+    ratio_m = '\t\t-'
+  else:
+    ratio_m = float(detected_m) / float(count_m) * 100
+    ratio_m = "\t\tM:{0:.0f}%".format(ratio_m)
+
+  ratio_g = float(detected_k + detected_m) / float(count_k + count_m) * 100
+  ratio_g = "\t\tG:{0:.0f}%".format(ratio_g)
+
+  print "[", original_gender, "]", detected, ratio_g, ratio_k, ratio_m
+
 def file_preprocessing(path):
-  data, fs, encoding = wavread(path)
+  data, fs, enc = wavread(path)
   signal = [mean(d) for d in data]
 
   f = wave.open(path, "r")
@@ -29,7 +48,7 @@ def m_frequency(data):
   signal, fs, frames = data
 
   T = frames / fs
-  period = 1.5
+  period = 1.7
   n = int(min(T, period) * fs)
 
   signal = signal[0:n]
@@ -63,26 +82,37 @@ files_path = './train/'
 files = os.listdir(files_path)
 files = list_files(files)
 
-detected = 0
-count = 0
+detected_k = 0
+detected_m = 0
+count_k = 0
+count_m = 0
 
 for f_name in files:
 
   original_gender = f_name[len(f_name) - 5]
 
   detected_gender = 'K'
-  if m_frequency(file_preprocessing(f_name)) < 175:
+  detected = False
+
+  if m_frequency(file_preprocessing(f_name)) < 172:
     detected_gender = 'M'
 
-  count += 1
-  if original_gender == detected_gender:
-    detected += 1
+  if original_gender == 'K':
+    count_k += 1
+    if detected_gender == original_gender:
+      detected = True
+      detected_k += 1
+  else:
+    count_m += 1
+    if detected_gender == original_gender:
+      detected = True
+      detected_m += 1
 
-  print detected_gender, " / ", original_gender, '\t', "{0:.0f}%".format(float(detected)/float(count)*100)
+  line_stats(detected_k, count_k, detected_m, count_m, detected, original_gender)
 
-print float(detected)/float(len(files))
-
-
+print "\n---------\n\n"
+print "M: ", detected_m, "/", count_m, "({0:.0f}%)".format(float(detected_m) / float(count_m) * 100)
+print "M: ", detected_k, "/", count_k, "({0:.0f}%)".format(float(detected_k) / float(count_k) * 100)
 
 
 
