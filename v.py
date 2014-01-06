@@ -30,7 +30,7 @@ def line_stats(detected_k, count_k, detected_m, count_m, detected, original_gend
   ratio_g = float(detected_k + detected_m) / float(count_k + count_m) * 100
   ratio_g = "\t\tG:{0:.0f}%".format(ratio_g)
 
-  print "[", original_gender, "]", detected, ratio_g, ratio_k, ratio_m
+  print "%02d" % (count_m + count_k,), ": [", original_gender, "]", detected, ratio_g, ratio_k, ratio_m
 
 def file_preprocessing(path):
   data, fs, enc = wavread(path)
@@ -53,7 +53,7 @@ def m_frequency(data):
 
   signal = signal[0:n]
 
-  amplitude = abs(fft(signal)) #glosnosc
+  amplitude = abs(fft(signal))
   frequency = linspace(0, fs, n)
 
   amp, freq = [], []
@@ -68,7 +68,6 @@ def m_frequency(data):
       freqOfMax = freq[i]
 
   return freqOfMax
-
 
 def list_files(files):
   processed = []
@@ -110,10 +109,8 @@ for f_name in files:
 
   line_stats(detected_k, count_k, detected_m, count_m, detected, original_gender)
 
-print "\n---------\n\n"
+print "---------------"
 print "M: ", detected_m, "/", count_m, "({0:.0f}%)".format(float(detected_m) / float(count_m) * 100)
-print "M: ", detected_k, "/", count_k, "({0:.0f}%)".format(float(detected_k) / float(count_k) * 100)
-
-
-
-
+print "K: ", detected_k, "/", count_k, "({0:.0f}%)".format(float(detected_k) / float(count_k) * 100)
+print "---------------"
+print "G: ", detected_m + detected_k, "/", count_m + count_k, "({0:.0f}%)".format(float(detected_k + detected_m) / float(count_k + count_m) * 100)
