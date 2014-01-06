@@ -53,21 +53,16 @@ def m_frequency(data):
 
   signal = signal[0:n]
 
-  amplitude = abs(fft(signal))
-  frequency = linspace(0, fs, n)
+  amp = abs(fft(signal))
+  freq = linspace(0, fs, n)
 
-  amp, freq = [], []
-  for i in range(len(frequency)):
-    if 85 < frequency[i] < 230:
-      freq.append(frequency[i])
-      amp.append(amplitude[i])
+  p_amp, p_freq = [], []
+  for i in range(len(freq)):
+    if 85 < freq[i] < 230:
+      p_freq.append(freq[i])
+      p_amp.append(amp[i])
 
-  maxAmp = max(amp)
-  for i in range(len(amp)):
-    if amp[i] == maxAmp:
-      freqOfMax = freq[i]
-
-  return freqOfMax
+  return p_freq[p_amp.index(max(p_amp))]
 
 def list_files(files):
   processed = []
@@ -93,7 +88,7 @@ for f_name in files:
   detected_gender = 'K'
   detected = False
 
-  if m_frequency(file_preprocessing(f_name)) < 172:
+  if m_frequency(file_preprocessing(f_name)) < 171:
     detected_gender = 'M'
 
   if original_gender == 'K':
