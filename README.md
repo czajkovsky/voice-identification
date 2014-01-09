@@ -5,6 +5,8 @@ Project done for Human Computer Interaction classes @ PUT Poznań (Phd. Wojciech
 
 Sound samples available at http://www.cs.put.poznan.pl/wjaskowski/pub/teaching/kck/gender/train.zip
 
+More detailed raport (in PL) available [here](https://github.com/czajkovsky/voice-identification/blob/master/raport/raport.md).
+
 #### Results
 ```
 Male:    37 / 45 (82%)
