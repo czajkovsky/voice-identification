@@ -1,3 +1,5 @@
+# Sprawozdanie
+
 ## Identyfikacja płci
 
 ### Opis algorytmu
@@ -115,3 +117,65 @@ Global:  76 / 91 (84%)
 89 : [ M ] True     G:83%     F:85%     M:81%
 90 : [ M ] True     G:83%     F:85%     M:82%
 91 : [ M ] True     G:84%     F:85%     M:82%
+```
+
+## Sygnały I
+
+**1. Punkty na osi OX spektrum są teraz kolejnymi liczbami naturalnymi, a nie częstotliwościami w Hz. Popraw skrypt, tak aby oś OX spektrum była w Hz (podpowiedź: oś OX rozpoczyna się od 0Hz, a kończy się na (prawie!)  Hz, gdzie  jest częstotliwością próbkowania).**
+```python
+freqs = linspace(0, w, n, endpoint = False)
+```
+**2. Wygeneruj spektrum dla funkcji sinus o częstotliwościach 5Hz i 21Hz. Czy rozpoznajesz te funkcje patrząc na ich spróbkowane wykresy?**
+
+Dla **5Hz** wykres jest widoczny, natomiast dla **21Hz** jest niemożliwy do rozpoznania.
+
+**3. Porównaj spektrum funkcji sin(2*pi*t), 2*sin(2*pi*t) i 3*sin(2*pi*t). Jak zmienia się wartość na osi OY na wykresie spektrum?**<br/>
+Wartości pozostają niezmienione
+
+**4. Ile punktów jest na wykresach przy częstotliwości próbkowania 50Hz, T=1s? Zwiększ dwukrotnie liczbę próbek poprzez zwiększenie rozważanego przedziału czasowego. Następnie: dla sin(2*pi*t) porównaj wartość na osi OY spektrum uzyskane w tym oraz poprzednim punkcie.**<br/>
+Liczba punktów jest wprost proporcjonalna do liczby próbek.
+
+**5. Na podstawie wyników uzyskanych w dwóch poprzednich punktach przeskaluj oś OY spektrum tak, aby wskazywała wartości amplitud badanych sygnałów. Sprawdź wyniki dla kilku wybranych funkcji, częstotliwości próbkowania oraz rozważanych liczb punktów.**
+```python
+ylim((0,max(signal1)))
+```
+**6. Jak się nazywa twierdzenie, którego konsekwencją jest takie zachowanie się spektrum?**
+Nyquista-Shannona o próbkowaniu
+
+**7. sin(5*pi*t), T=1s, w=100Hz. Co trzeba zmienić, aby precyzyjnie określić częstotliwość tej funkcji na podstawie spektrum?**<br/>
+Należy zmienić częstotliwość próbkowania.
+
+**8. sin(4*2*pi*t) + 0.5*random.random(n), T=2s, w=40Hz. Czy rozpoznajesz zadaną funkcję w szumie? Zwiększaj stopniowo początkowy poziom szumu (0.5) aż spektrum nie będzie jednoznaczne.**<br/>
+Przy współczynniku <code>4.75</code> funkcja jest trudna do rozpoznania.
+
+**9. 2.3 + sin(2*pi*t), T=1s, w=100Hz. Czy amplituda zerowego prążka jest prawidłowa? Dlaczego?**<br/>
+Amplituda nie jest prawidłowa, spectrum nie jest symetrycze.
+
+**10. sin(2*pi*t) oraz sin(2*pi*t + pi/4) dla T=1s, w=20Hz. Czy informacja o fazie zniknęła? Poszukaj śladów tej informacji w tablicy, będącej wynikiem operacji fft(signal).**
+Informacja o fazie zniknęła.
+
+## Sygnały II
+
+#### 1. Słońce
+
+![Alt text](./imgs/1.png)
+```
+Częstotliwość  cyklu aktywności słonecznej wynosi 1 na ok 12 lat.
+```
+
+#### 2. Proste filtrowanie.
+
+![Alt text](./imgs/2a.png)
+![Alt text](./imgs/2b.png)
+
+
+#### 3. Informacje o fazie.
+
+![Alt text](./imgs/3a.png)
+![Alt text](./imgs/3b.png)
+
+
+#### 4. Spectrum.
+
+![Alt text](./imgs/4.png)
+
